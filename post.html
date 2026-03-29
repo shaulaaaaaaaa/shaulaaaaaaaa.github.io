@@ -7,15 +7,186 @@
     <title>文章</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- KaTeX CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  
-    <!-- marked：渲染 Markdown -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  
-    <!-- KaTeX 核心 + 自动渲染插件 -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+  <!-- Markdown 解析 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- MathJax 配置 -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #333;
+    }
+
+    .navbar {
+      background: #222;
+      padding: 15px 20px;
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      margin-right: 20px;
+      font-size: 16px;
+    }
+
+    .navbar a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .post-card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .post-title {
+      margin-top: 0;
+      font-size: 32px;
+      color: #222;
+    }
+
+    .post-date {
+      color: #888;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+
+    .post-content {
+      line-height: 1.8;
+      font-size: 17px;
+    }
+
+    .post-content h1 {
+      font-size: 28px;
+      margin: 30px 0 15px;
+      color: #222;
+    }
+
+    .post-content h2 {
+      font-size: 24px;
+      margin: 25px 0 12px;
+      color: #222;
+    }
+
+    .post-content h3 {
+      font-size: 20px;
+      margin: 20px 0 10px;
+      color: #222;
+    }
+
+    .post-content p {
+      margin: 15px 0;
+    }
+
+    .post-content ul,
+    .post-content ol {
+      margin: 15px 0;
+      padding-left: 28px;
+    }
+
+    .post-content li {
+      margin: 8px 0;
+    }
+
+    .post-content code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      font-size: 0.95em;
+    }
+
+    .post-content pre {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+
+    .post-content pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    .post-content blockquote {
+      border-left: 4px solid #4caf50;
+      padding-left: 15px;
+      margin: 20px 0;
+      color: #666;
+      background: #fafafa;
+    }
+
+    .post-content a {
+      color: #2d7ef7;
+      text-decoration: none;
+    }
+
+    .post-content a:hover {
+      text-decoration: underline;
+    }
+
+    .post-content img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 15px 0;
+    }
+
+    .post-content hr {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin: 30px 0;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      color: #2d7ef7;
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      margin: 40px 0 20px;
+    }
+
+    /* MathJax 公式显示更自然 */
+    .post-content mjx-container {
+      margin: 10px 0 !important;
+    }
+  </style>
     
 
 </head>
@@ -43,29 +214,53 @@
         </footer>
     </div>
 
-    <script>
-        // 从 URL 获取文件名
-        const params = new URLSearchParams(window.location.search);
-        const file = params.get('file');
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const file = params.get('file');
 
-        if (file) {
-            fetch(file)
-                .then(response => response.text())
-                .then(content => {
-                    // 解析 Markdown
-                    document.getElementById('post-content').innerHTML = marked.parse(content);
-                    
-                    // 提取标题（从第一个 # 后面获取）
-                    const titleMatch = content.match(/^#\s+(.+)$/m);
-                    if (titleMatch) {
-                        document.getElementById('post-title').textContent = titleMatch[1];
-                    }
-                })
-                .catch(() => {
-                    document.getElementById('post-content').innerHTML = '<p>文章加载失败</p>';
-                });
-        }
-    </script>
+    if (file) {
+      fetch(file)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('文件加载失败');
+          }
+          return response.text();
+        })
+        .then(async content => {
+          // 提取标题
+          const titleMatch = content.match(/^#\s+(.+)$/m);
+          if (titleMatch) {
+            document.getElementById('post-title').textContent = titleMatch[1];
+          } else {
+            document.getElementById('post-title').textContent = '未命名文章';
+          }
+
+          // 提取日期（可选：如果 markdown 里写了 Date: 2024-01-01）
+          const dateMatch = content.match(/^Date:\s*(.+)$/mi);
+          if (dateMatch) {
+            document.getElementById('post-date').textContent = dateMatch[1];
+          }
+
+          // 渲染 Markdown
+          document.getElementById('post-content').innerHTML = marked.parse(content);
+
+          // 渲染数学公式
+          if (window.MathJax) {
+            await MathJax.typesetPromise([document.getElementById('post-content')]);
+          }
+        })
+        .catch(error => {
+          document.getElementById('post-title').textContent = '加载失败';
+          document.getElementById('post-content').innerHTML =
+            '<p>文章加载失败，请检查文件路径是否正确。</p>';
+          console.error(error);
+        });
+    } else {
+      document.getElementById('post-title').textContent = '未指定文章';
+      document.getElementById('post-content').innerHTML =
+        '<p>URL 中没有传入 file 参数，例如：<code>post.html?file=posts/first-post.md</code></p>';
+    }
+  </script>
 
 </body>
 </html>
