@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>文章</title>
-    <link rel="stylesheet" href="style.css">
-    
-    
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>文章</title>
+  <link rel="stylesheet" href="style.css" />
+
   <!-- Markdown 解析 -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -187,32 +185,28 @@
       margin: 10px 0 !important;
     }
   </style>
-    
-
 </head>
 <body>
 
-    <nav class="navbar">
-        <a href="index.html">首页</a>
-        <a href="#">存档</a>
-        <a href="#">关于</a>
-        <a href="#">联系</a>
-    </nav>
+  <nav class="navbar">
+    <a href="index.html">Home</a>
+    <a href="#">Archive</a>
+  </nav>
 
-    <div class="container">
-        <div class="post-card">
-            <h1 class="post-title" id="post-title">加载中...</h1>
-            <p class="post-date" id="post-date"></p>
-            <div class="post-content" id="post-content">
-                <!-- 文章内容会通过 JavaScript 加载 -->
-            </div>
-            <a href="blog.html" class="back-link">← 返回博客列表</a>
-        </div>
-
-        <footer class="footer">
-            <p>&copy; 2024 我的博客</p>
-        </footer>
+  <div class="container">
+    <div class="post-card">
+      <h1 class="post-title" id="post-title">加载中...</h1>
+      <p class="post-date" id="post-date"></p>
+      <div class="post-content" id="post-content">
+        正在加载文章内容...
+      </div>
+      <a href="blog.html" class="back-link">← 返回博客列表</a>
     </div>
+
+    <footer class="footer">
+      <p>&copy; 2024 我的博客</p>
+    </footer>
+  </div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
