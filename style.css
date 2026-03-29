@@ -16,18 +16,6 @@ body {
     background-attachment: fixed;
 }
 
-/* 半透明遮罩（让文字更清晰） */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.85);
-    z-index: -1;
-}
-
 /* 顶部导航栏 */
 .navbar {
     background-color: #333;
