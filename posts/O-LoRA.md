@@ -148,7 +148,7 @@ $$\mathcal{L} = \sum_{x,y \in D_t} \log p_\Theta(y|x) + \lambda_1 \sum_{i=1}^{t-
 
 | 符号 | 含义 |
 |------|------|
-| $\sum_{x,y \in D_t} \log p_\Theta(y|x)$ | **任务损失**：在新任务数据上的对数似然 |
+| $\sum_{x,y \in D_t} \log p_\Theta(y \mid x)$ | **任务损失**：在新任务数据上的对数似然 |
 | $\lambda_1$ | 正交损失的权重（超参数） |
 | $\mathcal{L}_{orth}(A_i, A_t)$ | **正交损失**：衡量新旧任务子空间的正交程度 |
 
@@ -158,7 +158,7 @@ $$\mathcal{L} = \sum_{x,y \in D_t} \log p_\Theta(y|x) + \lambda_1 \sum_{i=1}^{t-
 
 ### 公式5：正交损失的具体形式
 
-$$\mathcal{L}_{orth}(A_i, A_t) = \sum_{j,k} \| O_{i,t}[j,k] \|^2$$
+$$\mathcal{L}_{\mathrm{orth}}(A_i, A_t) = \sum_{j,k} |O_{i,t}[j,k]|^2$$
 
 | 符号 | 含义 |
 |------|------|
