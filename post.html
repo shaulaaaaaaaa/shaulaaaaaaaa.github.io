@@ -6,10 +6,8 @@
   <title>文章</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="latex.css" />
-  <!-- Markdown 解析 -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-  <!-- MathJax 配置 -->
   <script>
     window.MathJax = {
       tex: {
@@ -22,8 +20,26 @@
     };
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+      <a href="index.html">首页</a>
+      <a href="#">存档</a>
+      <a href="#">关于</a>
+      <a href="#">联系</a>
+    </nav>
 
+    <div class="container">
+      <h1 class="page-title">博客</h1>
+        
+      <div class="post-list" id="post-list">
+          <!-- 文章列表会通过 JavaScript 动态加载 -->
+      </div>
 
+      <footer class="footer">
+          <p>&copy; 2024 我的博客</p>
+      </footer>
+    </div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
@@ -32,46 +48,33 @@
     if (file) {
       fetch(file)
         .then(response => {
-          if (!response.ok) {
-            throw new Error('文件加载失败');
-          }
+          if (!response.ok) throw new Error('文件加载失败');
           return response.text();
         })
         .then(async content => {
-          // 提取标题
           const titleMatch = content.match(/^#\s+(.+)$/m);
-          if (titleMatch) {
-            document.getElementById('post-title').textContent = titleMatch[1];
-          } else {
-            document.getElementById('post-title').textContent = '未命名文章';
-          }
+          document.getElementById('post-title').textContent = titleMatch ? titleMatch[1] : '未命名文章';
 
-          // 提取日期（可选：如果 markdown 里写了 Date: 2024-01-01）
           const dateMatch = content.match(/^Date:\s*(.+)$/mi);
           if (dateMatch) {
             document.getElementById('post-date').textContent = dateMatch[1];
           }
 
-          // 渲染 Markdown
           document.getElementById('post-content').innerHTML = marked.parse(content);
 
-          // 渲染数学公式
           if (window.MathJax) {
             await MathJax.typesetPromise([document.getElementById('post-content')]);
           }
         })
         .catch(error => {
           document.getElementById('post-title').textContent = '加载失败';
-          document.getElementById('post-content').innerHTML =
-            '<p>文章加载失败，请检查文件路径是否正确。</p>';
+          document.getElementById('post-content').innerHTML = '<p>文章加载失败，请检查文件路径。</p>';
           console.error(error);
         });
     } else {
       document.getElementById('post-title').textContent = '未指定文章';
-      document.getElementById('post-content').innerHTML =
-        '<p>URL 中没有传入 file 参数，例如：<code>post.html?file=posts/first-post.md</code></p>';
+      document.getElementById('post-content').innerHTML = '<p>URL 中没有传入 file 参数，例如：<code>post.html?file=posts/first-post.md</code></p>';
     }
   </script>
-
 </body>
 </html>
