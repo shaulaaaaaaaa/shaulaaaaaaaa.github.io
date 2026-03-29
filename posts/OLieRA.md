@@ -1,15 +1,12 @@
-# 默认话题
-
-## 🧑‍💻 User
-
-
-
----
-## 🤖 Assistant
-
 # OLieRA: 正交低秩适配在李群中的连续学习
 
-## 动机（Motivation）
+[论文链接]([https://arxiv.org/abs/2509.06100v2])
+
+## Information
+
+![figure1](../images/OLieRA/inf.png)
+
+## Motivation
 
 **问题背景**：大语言模型在顺序多任务学习中面临灾难性遗忘——学习新任务会严重损害之前任务的性能。
 
