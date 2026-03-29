@@ -1,6 +1,6 @@
 # OLieRA: 正交低秩适配在李群中的连续学习
 
-[论文链接]([https://arxiv.org/abs/2509.06100v2])
+[论文链接](https://arxiv.org/abs/2509.06100v2)
 
 ## Information
 
