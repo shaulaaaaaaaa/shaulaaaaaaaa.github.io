@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>文章</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- 👈 引入 marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        /* Markdown 文章样式 */
+        .post-content h1 { font-size: 28px; margin: 30px 0 15px; color: #333; }
+        .post-content h2 { font-size: 24px; margin: 25px 0 12px; color: #333; }
+        .post-content h3 { font-size: 20px; margin: 20px 0 10px; color: #333; }
+        .post-content p { margin: 15px 0; line-height: 1.8; }
+        .post-content ul, .post-content ol { margin: 15px 0; padding-left: 25px; }
+        .post-content li { margin: 8px 0; line-height: 1.6; }
+        .post-content code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+        .post-content pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto; margin: 15px 0; }
+        .post-content pre code { background: none; padding: 0; color: inherit; }
+        .post-content blockquote { border-left: 4px solid #4CAF50; padding-left: 15px; margin: 15px 0; color: #666; }
+        .post-content a { color: #4CAF50; }
+        .post-content img { max-width: 100%; border-radius: 5px; }
+        .post-content hr { border: none; border-top: 1px solid #ddd; margin: 25px 0; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html">首页</a>
+        <a href="blog.html">博客</a>
+        <a href="#">关于</a>
+        <a href="#">联系</a>
+    </nav>
+
+    <div class="container">
+        <div class="post-card">
+            <h1 class="post-title" id="post-title">加载中...</h1>
+            <p class="post-date" id="post-date"></p>
+            <div class="post-content" id="post-content">
+                <!-- 文章内容会通过 JavaScript 加载 -->
+            </div>
+            <a href="blog.html" class="back-link">← 返回博客列表</a>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2024 我的博客</p>
+        </footer>
+    </div>
+
+    <script>
+        // 从 URL 获取文件名
+        const params = new URLSearchParams(window.location.search);
+        const file = params.get('file');
+
+        if (file) {
+            fetch(file)
+                .then(response => response.text())
+                .then(content => {
+                    // 解析 Markdown
+                    document.getElementById('post-content').innerHTML = marked.parse(content);
+                    
+                    // 提取标题（从第一个 # 后面获取）
+                    const titleMatch = content.match(/^#\s+(.+)$/m);
+                    if (titleMatch) {
+                        document.getElementById('post-title').textContent = titleMatch[1];
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('post-content').innerHTML = '<p>文章加载失败</p>';
+                });
+        }
+    </script>
+
+</body>
+</html>
