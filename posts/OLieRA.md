@@ -68,11 +68,13 @@ L_total = L_task + λ × L_orth
 
 ## 图表分析（Figure Analysis）
 ![figure1](../images/OLieRA/f1.png)
+
 **图1：更新机制对比**
 - 左侧（LoRA）：简单加法更新，忽视参数的内在结构
 - 右侧（OLieRA）：在李群约束下的乘法更新，保持参数结构的完整性
   
 ![figure1](../images/OLieRA/f2.png)
+
 **图2：OLieRA框架架构**
 展示了完整的流程：
 1. 冻结的预训练Transformer模型
@@ -85,6 +87,7 @@ L_total = L_task + λ × L_orth
 
 ## 表格分析（Table Analysis）
 ![figure1](../images/OLieRA/t1.png)
+
 **表1：标准CL基准和多任务场景结果**
 
 **关键发现**：
@@ -92,6 +95,7 @@ L_total = L_task + λ × L_orth
 - 在15任务的长序列场景中保持竞争力，说明方法的可扩展性
   
 ![figure1](../images/OLieRA/t3.png)
+
 **表3：泰勒展开阶数的影响**
 - 一阶展开：79.9%
 - 二阶展开：79.5-79.6%（最优）
@@ -100,12 +104,14 @@ L_total = L_task + λ × L_orth
 **启示**：二阶展开在精度和计算成本间达到最佳平衡。
 
 ![figure1](../images/OLieRA/t4.png)
+
 **表4：乘法更新的必要性**
 - 使用乘法更新：79.6%
 - 移除乘法更新（仅用加法）：77.2%
 - **性能下降2.3%**，证明李群框架的核心价值
 
 ![figure1](../images/OLieRA/t5.png)
+
 **表5：Fisher信息分析**
 - O-LoRA: 0.12-0.42
 - N-LoRA: 极小值(~10^-11)
