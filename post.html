@@ -9,6 +9,27 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <script>
+    // 配置 marked，保护 LaTeX 块
+    marked.setOptions({
+      breaks: false,
+      gfm: true
+    });
+
+    // 保护 $$...$$ 块不被 marked 处理
+    const renderer = new marked.Renderer();
+    const originalBlock = renderer.code.bind(renderer);
+    
+    renderer.code = function(code, language) {
+      if (language === 'math' || language === 'latex') {
+        return `<div class="math-block">$$${code}$$</div>`;
+      }
+      return originalBlock(code, language);
+    };
+    
+    marked.use({ renderer });
+  </script>
+
+  <script>
     window.MathJax = {
       tex: {
         inlineMath: [['$', '$'], ['\\(', '\\)']],
@@ -18,13 +39,6 @@
         fontCache: 'global'
       }
     };
-  </script>
-  </script>
-  // 配置 marked，保护 LaTeX 块不被处理
-    marked.setOptions({
-        breaks: false,
-        gfm: true
-    });
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
