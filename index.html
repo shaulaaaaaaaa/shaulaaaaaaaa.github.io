@@ -6,8 +6,6 @@
     <meta name="robots" content="noindex, nofollow">
     <title>博客</title>
     <link rel="stylesheet" href="style.css">
-    
-    <!-- 👈 引入 marked.js 库 -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
@@ -21,9 +19,12 @@
 
     <div class="container">
         <h1 class="page-title">博客</h1>
-        
-        <div class="post-list" id="post-list">
-            <!-- 文章列表会通过 JavaScript 动态加载 -->
+
+        <div class="post-list" id="post-list"></div>
+
+        <!-- 加载更多按钮 -->
+        <div class="load-more-container">
+            <button id="load-more" class="load-more-btn" style="display: none;">加载更多</button>
         </div>
 
         <footer class="footer">
@@ -32,42 +33,66 @@
     </div>
 
     <script>
-        // 文章列表（文件名和标题）
-        const posts = [
-            { file: 'posts/SD-LoRA.md', title: 'SD-LoRA: Scalable Decoupled Low-Rank Adaptation for Class Incremental Learning', date: '2026-03-30' },
-            { file: 'posts/Adaptive SVD.md', title: 'Sculpting Subspaces: Constrained Full Fine-Tuning in LLMs for Continual Learning', date: '2026-03-30' },
-            { file: 'posts/N-LoRA.md', title: 'N-LoRA by AI', date: '2026-03-30' },
-            { file: 'posts/O-LoRA.md', title: 'O-LoRA by AI', date: '2026-03-30' },
-            { file: 'posts/OLieRA.md', title: 'OLieRA by AI', date: '2026-03-30' },
-        ];
+        const POSTS_PER_PAGE = 10;  // 每页显示10篇
+        let allPosts = [];
+        let currentPage = 0;
 
-        // 加载文章列表
-        async function loadPosts() {
+        // 从 posts.json 加载文章列表
+        async function loadPostsMeta() {
+            try {
+                const response = await fetch('posts.json');
+                allPosts = await response.json();
+                renderPosts();
+            } catch (e) {
+                document.getElementById('post-list').innerHTML = '<p>文章列表加载失败</p>';
+                console.error(e);
+            }
+        }
+
+        // 渲染当前页的文章
+        async function renderPosts() {
             const list = document.getElementById('post-list');
-            
-            for (const post of posts) {
+            const start = currentPage * POSTS_PER_PAGE;
+            const end = start + POSTS_PER_PAGE;
+            const pagePosts = allPosts.slice(start, end);
+
+            for (const post of pagePosts) {
                 try {
                     const response = await fetch(post.file);
                     const content = await response.text();
-                    
-                    // 提取摘要（取前150个字符）
                     const plainText = content.replace(/[#*`\[\]]/g, '').substring(0, 150);
-                    
-                    list.innerHTML += `
-                        <div class="post-card">
-                            <h3><a href="post.html?file=${post.file}">${post.title}</a></h3>
-                            <p class="post-date">${post.date}</p>
-                            <p class="post-excerpt">${plainText}...</p>
-                            <a href="post.html?file=${post.file}" class="read-more">阅读全文 →</a>
-                        </div>
+
+                    const card = document.createElement('div');
+                    card.className = 'post-card';
+                    card.innerHTML = `
+                        <h3><a href="post.html?file=${encodeURIComponent(post.file)}">${post.title}</a></h3>
+                        <p class="post-date">${post.date}</p>
+                        <p class="post-excerpt">${plainText}...</p>
+                        <a href="post.html?file=${encodeURIComponent(post.file)}" class="read-more">阅读全文 →</a>
                     `;
+                    list.appendChild(card);
                 } catch (e) {
                     console.log('文章加载失败:', post.file);
                 }
             }
+
+            // 更新加载更多按钮
+            const loadMoreBtn = document.getElementById('load-more');
+            if (end < allPosts.length) {
+                loadMoreBtn.style.display = 'block';
+            } else {
+                loadMoreBtn.style.display = 'none';
+            }
         }
 
-        loadPosts();
+        // 加载更多
+        document.getElementById('load-more').addEventListener('click', () => {
+            currentPage++;
+            renderPosts();
+        });
+
+        // 初始化
+        loadPostsMeta();
     </script>
 
 </body>
