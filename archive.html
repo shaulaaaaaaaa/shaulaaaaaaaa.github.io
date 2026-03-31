@@ -1,1 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>存档</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+    <nav class="navbar">
+        <a href="index.html">首页</a>
+        <a href="archive.html">存档</a>
+        <a href="#">关于</a>
+        <a href="#">联系</a>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">存档</h1>
+        
+        <div class="category-list" id="category-list">
+            <!-- 类别列表通过 JavaScript 动态加载 -->
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2024 我的博客</p>
+        </footer>
+    </div>
+
+    <script>
+        // 加载存档页面
+        async function loadArchive() {
+            try {
+                const response = await fetch('posts.json');
+                const posts = await response.json();
+
+                // 按类别分组统计
+                const categories = {};
+                posts.forEach(post => {
+                    if (!categories[post.category]) {
+                        categories[post.category] = {
+                            name: post.category,
+                            count: 0,
+                            latestDate: post.date
+                        };
+                    }
+                    categories[post.category].count++;
+                    // 更新最新日期
+                    if (new Date(post.date) > new Date(categories[post.category].latestDate)) {
+                        categories[post.category].latestDate = post.date;
+                    }
+                });
+
+                // 渲染类别列表
+                const list = document.getElementById('category-list');
+                Object.values(categories).forEach(cat => {
+                    list.innerHTML += `
+                        <a href="category.html?name=${encodeURIComponent(cat.name)}" class="category-card">
+                            <h3>${cat.name}</h3>
+                            <p>${cat.count} 篇文章</p>
+                            <p class="category-latest">最新: ${cat.latestDate}</p>
+                        </a>
+                    `;
+                });
+
+            } catch (e) {
+                console.error('加载失败:', e);
+                document.getElementById('category-list').innerHTML = '<p>加载失败</p>';
+            }
+        }
+
+        loadArchive();
+    </script>
+
+</body>
+</html>

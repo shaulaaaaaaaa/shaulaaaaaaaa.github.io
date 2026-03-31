@@ -1,27 +1,32 @@
 [
     {
         "file": "posts/SD-LoRA.md",
-        "title": "SD-LoRA: Scalable Decoupled Low-Rank Adaptation for Class Incremental Learning",
-        "date": "2026-03-30"
+        "title": "SD-LoRA: Scalable Decoupled Low-Rank Adaptation",
+        "date": "2026-03-30",
+        "category": "Deep Learning"
     },
     {
         "file": "posts/Adaptive SVD.md",
-        "title": "Sculpting Subspaces: Constrained Full Fine-Tuning in LLMs for Continual Learning",
-        "date": "2026-03-29"
+        "title": "Sculpting Subspaces: Constrained Fine-Tuning in LLMs",
+        "date": "2026-03-29",
+        "category": "Deep Learning"
     },
     {
         "file": "posts/N-LoRA.md",
         "title": "N-LoRA by AI",
-        "date": "2026-03-28"
+        "date": "2026-03-28",
+        "category": "Continual Learning"
     },
     {
         "file": "posts/O-LoRA.md",
         "title": "O-LoRA by AI",
-        "date": "2026-03-27"
+        "date": "2026-03-27",
+        "category": "Continual Learning"
     },
     {
         "file": "posts/OLieRA.md",
         "title": "OLieRA by AI",
-        "date": "2026-03-26"
+        "date": "2026-03-26",
+        "category": "AI"
     }
 ]
