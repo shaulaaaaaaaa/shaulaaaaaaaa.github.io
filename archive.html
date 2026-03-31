@@ -17,10 +17,12 @@
 
     <div class="container">
         <h1 class="page-title">存档</h1>
-        
-        <div class="category-list" id="category-list">
-            <!-- 类别列表通过 JavaScript 动态加载 -->
+
+        <div class="breadcrumb">
+            <span>存档</span>
         </div>
+
+        <div class="category-list" id="category-list"></div>
 
         <footer class="footer">
             <p>&copy; 2024 我的博客</p>
@@ -28,37 +30,58 @@
     </div>
 
     <script>
-        // 加载存档页面
-        async function loadArchive() {
+        async function loadCategories() {
             try {
                 const response = await fetch('posts.json');
                 const posts = await response.json();
 
-                // 按类别分组统计
                 const categories = {};
                 posts.forEach(post => {
                     if (!categories[post.category]) {
                         categories[post.category] = {
-                            name: post.category,
                             count: 0,
+                            subcategories: new Set(),
                             latestDate: post.date
                         };
                     }
                     categories[post.category].count++;
-                    // 更新最新日期
+                    // 只有存在 subcategory 才添加
+                    if (post.subcategory) {
+                        categories[post.category].subcategories.add(post.subcategory);
+                    }
                     if (new Date(post.date) > new Date(categories[post.category].latestDate)) {
                         categories[post.category].latestDate = post.date;
                     }
                 });
 
-                // 渲染类别列表
                 const list = document.getElementById('category-list');
-                Object.values(categories).forEach(cat => {
+
+                Object.entries(categories).forEach(([name, cat]) => {
+                    const hasSub = cat.subcategories.size > 0;
+
+                    // 有子类别 → 跳转 subcategory.html
+                    // 无子类别 → 直接跳转 category.html
+                    const href = hasSub
+                        ? `subcategory.html?category=${encodeURIComponent(name)}`
+                        : `category.html?category=${encodeURIComponent(name)}`;
+
+                    const subInfo = hasSub
+                        ? `${cat.subcategories.size} 个子类别`
+                        : '无子类别';
+
+                    const tagsHtml = hasSub
+                        ? `<div class="subcategory-tags">
+                             ${[...cat.subcategories].map(s => `<span class="tag">${s}</span>`).join('')}
+                           </div>`
+                        : '';
+
                     list.innerHTML += `
-                        <a href="category.html?name=${encodeURIComponent(cat.name)}" class="category-card">
-                            <h3>${cat.name}</h3>
-                            <p>${cat.count} 篇文章</p>
+                        <a href="${href}" class="category-card">
+                            <div class="card-icon">${hasSub ? '📁' : '📄'}</div>
+                            <h3>${name}</h3>
+                            <p>${cat.count} 篇文章 · ${subInfo}</p>
                             <p class="category-latest">最新: ${cat.latestDate}</p>
+                            ${tagsHtml}
                         </a>
                     `;
                 });
@@ -69,7 +92,7 @@
             }
         }
 
-        loadArchive();
+        loadCategories();
     </script>
 
 </body>

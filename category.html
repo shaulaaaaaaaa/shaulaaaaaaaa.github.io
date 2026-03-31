@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>类别</title>
+    <title>文章列表</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,10 +16,10 @@
     </nav>
 
     <div class="container">
-        <h1 class="page-title" id="category-title">加载中...</h1>
-        
-        <a href="archive.html" class="back-link">← 返回存档</a>
-        
+        <h1 class="page-title" id="page-title">加载中...</h1>
+
+        <div class="breadcrumb" id="breadcrumb"></div>
+
         <div class="post-list" id="post-list"></div>
 
         <footer class="footer">
@@ -28,45 +28,85 @@
     </div>
 
     <script>
-        // 从 URL 获取类别名称
         const urlParams = new URLSearchParams(window.location.search);
-        const categoryName = decodeURIComponent(urlParams.get('name'));
+        const categoryName = urlParams.get('category') ? decodeURIComponent(urlParams.get('category')) : null;
+        const subcategoryName = urlParams.get('subcategory') ? decodeURIComponent(urlParams.get('subcategory')) : null;
 
-        // 加载该类别的文章
-        async function loadCategoryPosts() {
-            document.getElementById('category-title').textContent = categoryName;
+        async function loadPosts() {
+            // 设置标题
+            document.getElementById('page-title').textContent = subcategoryName || categoryName;
+
+            // 设置面包屑
+            const breadcrumb = document.getElementById('breadcrumb');
+            if (subcategoryName) {
+                // 有子类别：存档 / 大类别 / 子类别
+                breadcrumb.innerHTML = `
+                    <a href="archive.html">存档</a>
+                    <span> / </span>
+                    <a href="subcategory.html?category=${encodeURIComponent(categoryName)}">${categoryName}</a>
+                    <span> / </span>
+                    <span>${subcategoryName}</span>
+                `;
+            } else {
+                // 无子类别：存档 / 大类别
+                breadcrumb.innerHTML = `
+                    <a href="archive.html">存档</a>
+                    <span> / </span>
+                    <span>${categoryName}</span>
+                `;
+            }
 
             try {
                 const response = await fetch('posts.json');
                 const allPosts = await response.json();
 
-                // 筛选该类别的文章
-                const categoryPosts = allPosts.filter(post => post.category === categoryName);
+                // 筛选文章
+                let filtered;
+                if (subcategoryName) {
+                    // 按大类别 + 子类别筛选
+                    filtered = allPosts.filter(
+                        p => p.category === categoryName && p.subcategory === subcategoryName
+                    );
+                } else {
+                    // 只按大类别筛选（无子类别的情况）
+                    filtered = allPosts.filter(p => p.category === categoryName);
+                }
 
-                // 按日期排序（最新的在前）
-                categoryPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+                // 按日期排序
+                filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-                // 渲染文章列表
                 const list = document.getElementById('post-list');
-                
-                if (categoryPosts.length === 0) {
-                    list.innerHTML = '<p>该分类下暂无文章</p>';
+
+                if (filtered.length === 0) {
+                    list.innerHTML = '<p>暂无文章</p>';
                     return;
                 }
 
-                for (const post of categoryPosts) {
-                    const res = await fetch(post.file);
-                    const content = await res.text();
-                    const plainText = content.replace(/[#*`\[\]]/g, '').substring(0, 150);
+                for (const post of filtered) {
+                    try {
+                        const res = await fetch(post.file);
+                        const content = await res.text();
+                        const plainText = content.replace(/[#*`\[\]]/g, '').substring(0, 150);
 
-                    list.innerHTML += `
-                        <div class="post-card">
-                            <h3><a href="post.html?file=${encodeURIComponent(post.file)}">${post.title}</a></h3>
-                            <p class="post-date">${post.date}</p>
-                            <p class="post-excerpt">${plainText}...</p>
-                            <a href="post.html?file=${encodeURIComponent(post.file)}" class="read-more">阅读全文 →</a>
-                        </div>
-                    `;
+                        // 标签显示
+                        const tagText = post.subcategory
+                            ? `${post.category} / ${post.subcategory}`
+                            : post.category;
+
+                        list.innerHTML += `
+                            <div class="post-card">
+                                <h3><a href="post.html?file=${encodeURIComponent(post.file)}">${post.title}</a></h3>
+                                <div class="post-meta">
+                                    <span class="post-date">${post.date}</span>
+                                    <span class="post-tag">${tagText}</span>
+                                </div>
+                                <p class="post-excerpt">${plainText}...</p>
+                                <a href="post.html?file=${encodeURIComponent(post.file)}" class="read-more">阅读全文 →</a>
+                            </div>
+                        `;
+                    } catch (e) {
+                        console.log('文章加载失败:', post.file);
+                    }
                 }
 
             } catch (e) {
@@ -75,7 +115,7 @@
             }
         }
 
-        loadCategoryPosts();
+        loadPosts();
     </script>
 
 </body>
