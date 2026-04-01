@@ -9,26 +9,14 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <script>
-    // 配置 marked，保护 LaTeX 块
+    // 配置 marked
     marked.setOptions({
       breaks: false,
       gfm: true
     });
-
-    // 保护 $$...$$ 块不被 marked 处理
-    const renderer = new marked.Renderer();
-    const originalBlock = renderer.code.bind(renderer);
-    
-    renderer.code = function(code, language) {
-      if (language === 'math' || language === 'latex') {
-        return `<div class="math-block">$$${code}$$</div>`;
-      }
-      return originalBlock(code, language);
-    };
-    
-    marked.use({ renderer });
   </script>
 
+  <!-- MathJax 配置 -->
   <script>
     window.MathJax = {
       tex: {
@@ -37,10 +25,16 @@
       },
       svg: {
         fontCache: 'global'
+      },
+      startup: {
+        pageReady: () => {
+          // 页面加载完成后不自动渲染，等待我们手动调用
+          return MathJax.startup.defaultPageReady();
+        }
       }
     };
   </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -61,6 +55,35 @@
     </div>
 
   <script>
+    // 保护数学公式不被 Markdown 解析器破坏
+    function protectMath(content) {
+      const mathBlocks = [];
+
+      // 先保护 $$...$$ 块（多行）
+      content = content.replace(/\$\$([\s\S]+?)\$\$/g, (match, math) => {
+        const index = mathBlocks.length;
+        mathBlocks.push(`$$${math}$$`);
+        return `%%MATHBLOCK${index}%%`;
+      });
+
+      // 再保护 $...$ 行内公式（非贪婪，避免匹配到 $$）
+      content = content.replace(/(?<!\$)\$(?!\$)(.+?)(?<!\$)\$(?!\$)/g, (match, math) => {
+        const index = mathBlocks.length;
+        mathBlocks.push(`$${math}$`);
+        return `%%MATHBLOCK${index}%%`;
+      });
+
+      return { content, mathBlocks };
+    }
+
+    // 还原数学公式
+    function restoreMath(html, mathBlocks) {
+      mathBlocks.forEach((block, index) => {
+        html = html.replace(new RegExp(`%%MATHBLOCK${index}%%`, 'g'), block);
+      });
+      return html;
+    }
+
     const params = new URLSearchParams(window.location.search);
     const file = params.get('file');
 
@@ -71,17 +94,30 @@
           return response.text();
         })
         .then(async content => {
+          // 提取标题
           const titleMatch = content.match(/^#\s+(.+)$/m);
           document.getElementById('post-title').textContent = titleMatch ? titleMatch[1] : '未命名文章';
 
+          // 提取日期
           const dateMatch = content.match(/^Date:\s*(.+)$/mi);
           if (dateMatch) {
             document.getElementById('post-date').textContent = dateMatch[1];
           }
 
-          document.getElementById('post-content').innerHTML = marked.parse(content);
+          // 1. 保护数学公式
+          const { content: protectedContent, mathBlocks } = protectMath(content);
 
-          if (window.MathJax) {
+          // 2. Markdown 渲染
+          let html = marked.parse(protectedContent);
+
+          // 3. 还原数学公式
+          html = restoreMath(html, mathBlocks);
+
+          // 4. 插入页面
+          document.getElementById('post-content').innerHTML = html;
+
+          // 5. MathJax 渲染
+          if (window.MathJax && window.MathJax.typesetPromise) {
             await MathJax.typesetPromise([document.getElementById('post-content')]);
           }
         })
